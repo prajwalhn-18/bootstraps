@@ -1,4 +1,3 @@
-// src/routes/health/index.ts
 import express, { Request, Response } from "express";
 import { AppDataSource } from "../../dal/dataSource.js";
 

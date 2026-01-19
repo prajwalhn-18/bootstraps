@@ -25,7 +25,6 @@ const morganStream = {
             const requestId = parts[5] !== "-" ? parts[5] : null;
             const ip = parts[6] !== "-" ? parts[6] : null;
 
-            // Build structured log message
             const logData: Record<string, any> = {
                 method,
                 url,
@@ -37,10 +36,8 @@ const morganStream = {
             if (requestId !== null) logData.requestId = requestId;
             if (ip !== null) logData.ip = ip;
 
-            // Format as JSON string in message
             const messageText = `HTTP Request ${JSON.stringify(logData)}`;
 
-            // Log at appropriate level based on status code
             if (statusCode >= 500) {
                 logger.error(messageText);
             } else if (statusCode >= 400) {
@@ -49,15 +46,12 @@ const morganStream = {
                 logger.info(messageText);
             }
         } else {
-            // Fallback for unexpected format
             logger.info(trimmed);
         }
     },
 };
 
-// Custom format: method | url | status | responseTime | contentLength | requestId | ip
-const customFormat =
-    ":method | :url | :status | :response-time ms | :res[content-length] | :request-id | :ip";
+const customFormat = ":method | :url | :status | :response-time ms | :res[content-length] | :request-id | :ip";
 
 export const morganLogger = morgan(customFormat, {
     stream: morganStream,
