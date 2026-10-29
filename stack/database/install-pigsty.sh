@@ -12,8 +12,14 @@ pigsty::install_cmd() {
 curl -fsSL https://repo.pigsty.cc/get | bash
 cd ~/pigsty
 ./configure
-./install.yml
+./deploy.yml
 CMD
+}
+
+pigsty::is_reachable() {
+    local host="$1"
+    local port="${2:-5432}"
+    target::run "$host" "bash -c 'exec 3<>/dev/tcp/127.0.0.1/$port'" >/dev/null 2>&1
 }
 
 main() {
@@ -57,11 +63,8 @@ main() {
     prereq::require_cmd "ssh" || exit 1
     prereq::require_cmd "bash" || exit 1
 
-    local presence
-    presence=$(target::run "$host" '[ -d ~/pigsty ] && echo PRESENT || echo ABSENT')
-
-    if [[ "$presence" == "PRESENT" && "$force" -ne 1 ]]; then
-        log::info "Pigsty already installed on $host, skipping (use --force to reinstall)"
+    if pigsty::is_reachable "$host" 5432 && [[ "$force" -ne 1 ]]; then
+        log::info "Postgres already reachable on $host:5432, skipping (use --force to reinstall)"
         exit 0
     fi
 

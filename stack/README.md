@@ -5,6 +5,8 @@ Postgres + observability, set up once per machine/server, then used by every pro
 - **Postgres** — a single [Pigsty](https://pigsty.io) instance per machine/server. Every project gets its own database and role on it, not its own Postgres install.
 - **Observability** — one shared OTel Collector + Tempo (traces) + Loki (logs) stack, wired into Pigsty's own Grafana + Prometheus. Every project/service is told apart by its `OTEL_SERVICE_NAME`, not a separate stack.
 
+> **Pigsty needs a real Linux machine to actually run Postgres on.** `--host local` means "the Linux box I'm on" — a Linux VM, WSL2, or a bare-metal Linux dev machine — not macOS. On a Mac, Pigsty's installer will happily bootstrap/configure itself as a *control* node, but the actual Postgres deploy step needs a Linux target: either run `--host local` inside a Linux VM, or point `--host` at a remote Linux server instead.
+
 ## Run once per machine/server
 
 ```bash
