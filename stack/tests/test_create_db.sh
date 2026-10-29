@@ -1,8 +1,8 @@
 # stack/tests/test_create_db.sh
 prereq::require_cmd "docker" || { log::warn "docker not available, skipping create-db tests"; return 0; }
 
+docker rm -f stack-test-pg >/dev/null 2>&1
 docker run -d --rm --name stack-test-pg -e POSTGRES_PASSWORD=postgres -p 55432:5432 postgres:16-alpine >/dev/null
-trap 'docker stop stack-test-pg >/dev/null 2>&1' EXIT
 # wait for readiness
 for i in $(seq 1 30); do docker exec stack-test-pg pg_isready -U postgres >/dev/null 2>&1 && break; sleep 1; done
 
@@ -21,3 +21,5 @@ assert_eq "$out" "$out2" "re-running returns the identical DATABASE_URL (same pa
 
 ( bash "$SCRIPT" "My-Bad-Name!" --admin-dsn "$ADMIN_DSN" --state-dir "$STATE_DIR" ) 2>/dev/null
 assert_failure "$?" "rejects an invalid Postgres identifier"
+
+docker stop stack-test-pg >/dev/null 2>&1
